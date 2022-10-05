@@ -1,0 +1,72 @@
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    const z = {
+        batchSize: 2,
+        data: [],
+        batchPromiseRecursive() {
+            var batch = this.data.splice(0, this.batchSize);
+
+            if (batch.length == 0) {
+                return $.Deferred().resolve().promise();
+            }
+
+            return $.get("https://jsonplaceholder.typicode.com/users/").done(function (serverData) {
+                console.log(serverData);
+            })
+            .fail(function (e) {
+                console.log(e);
+            })
+            .then(function () {
+                console.log("Wait 2 sec...");
+                wait(2000);
+                return z.batchPromiseRecursive();
+            });
+        }
+    };
+
+    function wait(ms) {
+      const start = Date.now();
+      let now = start;
+      while (now - start < ms) {
+        now = Date.now();
+      }
+    }
+
+    z.data = [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]];
+    z.batchSize = 2;
+    z.batchPromiseRecursive().then(() => {
+        alert("DONE");
+    });
+
+    /**
+     * Practice or define objects.
+     */
+
+    
+     Object.defineProperty(Array.prototype, "batchPost", {
+      value() {
+        let self = this;
+        console.log(this);
+      },
+    });
+
+    Object.defineProperty(Array.prototype, "chunk", {
+      value: function (chunkSize) {
+        var array = this;
+        return [].concat.apply(
+          [],
+          array.map(function (elem, i) {
+            return i % chunkSize ? [] : [array.slice(i, i + chunkSize)];
+          })
+        );
+      },
+    });
+
+    Object.defineProperty(Array.prototype, 'log', {
+        value: function() {
+            console.log(this);
+        }
+    });
+
+</script>
